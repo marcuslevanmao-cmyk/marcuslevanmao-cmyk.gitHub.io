@@ -22,14 +22,14 @@
       background-position: center;
     }
 
-    /* COLOR MORPH LAYER (comes IN on click) */
+    /* COLOR MORPH LAYER */
     .bg {
       position: fixed;
       inset: 0;
-      background-color: #dfc7a7;
+      background-color: #0023BE;
       transform: scale(0);
       transform-origin: center;
-      transition: transform 0.7s ease;
+      transition: transform 0.7s ease, background-color 0.4s ease;
       z-index: 0;
     }
 
@@ -44,7 +44,7 @@
       left: 50%;
       transform: translateX(-50%) translateY(-20px);
       color: white;
-      font-size: 4rem;
+      font-size: 2rem;
       opacity: 0;
       transition: opacity 0.6s ease, transform 0.6s ease;
       z-index: 1;
@@ -62,19 +62,48 @@
   <div class="text" id="text">Internal Thoughts</div>
 
   <script>
-    let toggled = false;
     const bg = document.getElementById('bg');
     const text = document.getElementById('text');
 
-    document.body.addEventListener('click', () => {
-      toggled = !toggled;
+    let isActive = false;
+    let currentColor = null;
 
-      if (toggled) {
-        bg.classList.add('active');
-        text.classList.add('show');
-      } else {
+    // Prevent right-click menu
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    document.addEventListener('mousedown', (e) => {
+      let color;
+
+      if (e.button === 0) {
+        color = '#dfc7a7';
+      } else if (e.button === 2) {
+        color = '#7fa6c9';
+      } else if (e.button === 1) {
+        color = '#c0392b';
+      }
+
+      if (!color) return;
+
+      // If clicking SAME color again → revert to image
+      if (isActive && currentColor === color) {
         bg.classList.remove('active');
         text.classList.remove('show');
+        isActive = false;
+        currentColor = null;
+        return;
+      }
+
+      // First activation → play morph animation
+      if (!isActive) {
+        bg.style.backgroundColor = color;
+        bg.classList.add('active');
+        text.classList.add('show');
+        isActive = true;
+        currentColor = color;
+      } else {
+        // Switch to different color smoothly
+        bg.style.backgroundColor = color;
+        currentColor = color;
       }
     });
   </script>
